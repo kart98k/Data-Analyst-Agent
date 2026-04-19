@@ -1,0 +1,82 @@
+import os
+import json
+from dotenv import load_dotenv
+load_dotenv()
+
+import pandas as pd
+from agno.agent import Agent
+from agno.models.openai import OpenAIChat
+from agno.tools.visualization import VisualizationTools
+from pathlib import Path
+
+
+# Load data Function
+def load_data(file_path):
+    """
+    Load data from a given CSV file path and convert it to a JSON string of records.
+
+    Parameters
+    ----------
+    file_path : str
+        The path to the CSV file to load.
+
+    Returns
+    -------
+    str
+        A JSON string of records representing the data in the CSV file.
+    """
+    return pd.read_csv(file_path).to_json(orient="records")
+
+
+# Create an agent with visualization capabilities
+viz_agent = Agent(
+    model=OpenAIChat(
+        id="gpt-4o",
+        api_key=os.environ.get("OPENAI_API_KEY")
+    ),
+    tools=[VisualizationTools(output_dir="charts")],
+    instructions=[
+    "You are an expert data analyst and visualization specialist.",
+
+    "Inspect the dataset carefully.",
+    "Use ONLY actual columns present in the dataset.",
+
+    "You MUST generate a diverse set of charts, not only numeric charts.",
+
+    "Generate at least 8 charts total using these categories:",
+
+    "1. Categorical Charts (minimum 3):",
+    "- Bar chart",
+    "- Horizontal bar chart",
+    "- Pie chart",
+    "- Count plot",
+
+    "2. Numeric Charts (minimum 2):",
+    "- Histogram",
+    "- Box plot",
+    "- Line chart",
+
+    "3. Mixed Charts (minimum 2):",
+    "- Average numeric metric grouped by category",
+    "- Sum metric by category",
+    "- Boxplot numeric by category",
+
+    "4. Relationship Charts (minimum 1):",
+    "- Scatter plot",
+    "- Correlation heatmap if numeric columns exist",
+
+    "Use top 10 categories if too many unique values.",
+
+    "Every chart must include title, labels, readable formatting.",
+
+    "Avoid generating repetitive charts.",
+
+    "After charts, provide concise insights."
+],
+    context={"dataset": load_data(Path("./data/financial_sample.csv"))},
+    add_context=True,
+    show_tool_calls=True,
+    markdown=True,
+)
+
+viz_agent.print_response("Create a report for the data in context.")
