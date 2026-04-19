@@ -10,4 +10,4 @@ RUN pip install streamlit pandas plotly openai python-dotenv
 
 EXPOSE 8501
 
-CMD ["streamlit", "run", "scripts/app.py", "--server.address=0.0.0.0", "--server.port=8501"]
+CMD streamlit run scripts/app.py --server.address=0.0.0.0 --server.port=$PORT
