@@ -56,3 +56,7 @@ Install dependencies:
 
 ```bash
 pip install -r requirements.txt
+
+## 🚀 Live Demo
+
+🔗 [Click Here to Open App](https://data-analyst-agent-gwbe.onrender.com)
